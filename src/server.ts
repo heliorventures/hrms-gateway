@@ -24,6 +24,9 @@ import { SUBGRAPHS, subgraphUrl, type SubgraphDef } from "./subgraphs.js";
 const GATEWAY_PORT = Number(process.env.KABIPAY_GATEWAY_PORT ?? 4009);
 const TENANT_HEADER = "x-tenant-id";
 const AUTH_HEADER = "authorization";
+/** Forwarded to subgraphs for attendance IP policy and similar (set by edge proxy when present). */
+const FORWARDED_FOR_HEADER = "x-forwarded-for";
+const REAL_IP_HEADER = "x-real-ip";
 
 interface StitchedSubgraph {
   def: SubgraphDef;
@@ -34,6 +37,8 @@ interface StitchedSubgraph {
 interface ForwardContext {
   tenantId?: string;
   authorization?: string;
+  forwardedFor?: string;
+  realIp?: string;
 }
 
 /**
@@ -48,6 +53,8 @@ function forwardHeaders(
   const headers: Record<string, string> = {};
   if (ctx?.tenantId) headers[TENANT_HEADER] = ctx.tenantId;
   if (ctx?.authorization) headers[AUTH_HEADER] = ctx.authorization;
+  if (ctx?.forwardedFor) headers[FORWARDED_FOR_HEADER] = ctx.forwardedFor;
+  if (ctx?.realIp) headers[REAL_IP_HEADER] = ctx.realIp;
   return headers;
 }
 
@@ -98,6 +105,8 @@ async function main() {
     context: ({ request }) => ({
       tenantId: request.headers.get(TENANT_HEADER) ?? undefined,
       authorization: request.headers.get(AUTH_HEADER) ?? undefined,
+      forwardedFor: request.headers.get(FORWARDED_FOR_HEADER) ?? undefined,
+      realIp: request.headers.get(REAL_IP_HEADER) ?? undefined,
     }),
     landingPage: false,
   });
