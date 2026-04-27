@@ -31,6 +31,7 @@ export const SUBGRAPHS: SubgraphDef[] = [
   { name: "grievance", port: 4026, plane: "tenant" },
   { name: "workflow", port: 4027, plane: "tenant" },
   { name: "notification", port: 4028, plane: "tenant" },
+  { name: "analytics", port: 4029, plane: "tenant" },
 ];
 
 export function baseUrl(): string {
