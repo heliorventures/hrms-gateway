@@ -12,9 +12,7 @@ export interface SubgraphDef {
 }
 
 export const SUBGRAPHS: SubgraphDef[] = [
-  { name: "operator", port: 4010, plane: "ops" },
-  { name: "tenant", port: 4011, plane: "ops" },
-  { name: "billing", port: 4012, plane: "ops" },
+  { name: "ops", port: 4010, plane: "ops" },
   { name: "employee", port: 4013, plane: "tenant" },
   { name: "leave", port: 4014, plane: "tenant" },
   { name: "attendance", port: 4015, plane: "tenant" },
