@@ -19,26 +19,14 @@ import { stitchSchemas } from "@graphql-tools/stitch";
 import { schemaFromExecutor } from "@graphql-tools/wrap";
 import { buildHTTPExecutor } from "@graphql-tools/executor-http";
 import { createServer } from "node:http";
+import { forwardHeaders } from "./forwardHeaders.js";
 import { SUBGRAPHS, subgraphUrl, type SubgraphDef } from "./subgraphs.js";
 
 const GATEWAY_PORT = Number(process.env.KABIPAY_GATEWAY_PORT ?? 4009);
-const TENANT_HEADER = "x-tenant-id";
-const AUTH_HEADER = "authorization";
-/** Forwarded to subgraphs for attendance IP policy and similar (set by edge proxy when present). */
-const FORWARDED_FOR_HEADER = "x-forwarded-for";
-const REAL_IP_HEADER = "x-real-ip";
-
 interface StitchedSubgraph {
   def: SubgraphDef;
   schema: Awaited<ReturnType<typeof schemaFromExecutor>>;
   url: string;
-}
-
-interface ForwardContext {
-  tenantId?: string;
-  authorization?: string;
-  forwardedFor?: string;
-  realIp?: string;
 }
 
 /**
@@ -46,23 +34,16 @@ interface ForwardContext {
  * (or both) may be missing — `kabipay-common::subgraph` accepts a JWT
  * alone and extracts the tenant from its claims.
  */
-function forwardHeaders(
-  executorRequest: { context?: unknown } | undefined,
-): Record<string, string> {
-  const ctx = executorRequest?.context as ForwardContext | undefined;
-  const headers: Record<string, string> = {};
-  if (ctx?.tenantId) headers[TENANT_HEADER] = ctx.tenantId;
-  if (ctx?.authorization) headers[AUTH_HEADER] = ctx.authorization;
-  if (ctx?.forwardedFor) headers[FORWARDED_FOR_HEADER] = ctx.forwardedFor;
-  if (ctx?.realIp) headers[REAL_IP_HEADER] = ctx.realIp;
-  return headers;
+function forwardedExecutorHeaders(executorRequest?: { context?: unknown }): Record<string, string> {
+  const context = executorRequest?.context as { request?: Request } | undefined;
+  return forwardHeaders(context?.request);
 }
 
 async function loadSubgraph(def: SubgraphDef): Promise<StitchedSubgraph | null> {
   const url = subgraphUrl(def.port);
   const executor = buildHTTPExecutor({
     endpoint: url,
-    headers: forwardHeaders,
+    headers: forwardedExecutorHeaders,
   });
   try {
     const schema = await schemaFromExecutor(executor);
@@ -92,7 +73,7 @@ async function main() {
     subschemas: loaded.map((s) => {
       const executor = buildHTTPExecutor({
         endpoint: s.url,
-        headers: forwardHeaders,
+        headers: forwardedExecutorHeaders,
       });
       return { schema: s.schema, executor };
     }),
@@ -102,12 +83,7 @@ async function main() {
     schema: stitched,
     graphqlEndpoint: "/graphql",
     cors: { origin: "*", credentials: true },
-    context: ({ request }) => ({
-      tenantId: request.headers.get(TENANT_HEADER) ?? undefined,
-      authorization: request.headers.get(AUTH_HEADER) ?? undefined,
-      forwardedFor: request.headers.get(FORWARDED_FOR_HEADER) ?? undefined,
-      realIp: request.headers.get(REAL_IP_HEADER) ?? undefined,
-    }),
+    context: ({ request }) => ({ request }),
     landingPage: false,
   });
 
