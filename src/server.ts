@@ -20,7 +20,13 @@ import { schemaFromExecutor } from "@graphql-tools/wrap";
 import { buildHTTPExecutor } from "@graphql-tools/executor-http";
 import { createServer } from "node:http";
 import { forwardHeaders } from "./forwardHeaders.js";
-import { SUBGRAPHS, subgraphUrl, type SubgraphDef } from "./subgraphs.js";
+import { missingRequiredClientFields } from "./schemaContract.js";
+import {
+  allowPartialSubgraphs,
+  SUBGRAPHS,
+  subgraphUrl,
+  type SubgraphDef,
+} from "./subgraphs.js";
 
 const GATEWAY_PORT = Number(process.env.KABIPAY_GATEWAY_PORT ?? 4009);
 interface StitchedSubgraph {
@@ -63,6 +69,15 @@ async function main() {
     await Promise.all(SUBGRAPHS.map((def) => loadSubgraph(def)))
   ).filter((s): s is StitchedSubgraph => s !== null);
 
+  const loadedNames = new Set(loaded.map(({ def }) => def.name));
+  const missing = SUBGRAPHS.filter(({ name }) => !loadedNames.has(name));
+  const partialSubgraphsAllowed = allowPartialSubgraphs();
+  if (missing.length > 0 && !partialSubgraphsAllowed) {
+    throw new Error(
+      `required subgraphs unavailable: ${missing.map(({ name }) => name).join(", ")}`,
+    );
+  }
+
   if (loaded.length === 0) {
     console.error(
       "[gateway] no subgraphs reachable \u2014 serving empty schema; start subgraphs and restart the gateway.",
@@ -78,6 +93,13 @@ async function main() {
       return { schema: s.schema, executor };
     }),
   });
+
+  if (!partialSubgraphsAllowed) {
+    const missingFields = missingRequiredClientFields(stitched);
+    if (missingFields.length > 0) {
+      throw new Error(`required client schema fields unavailable: ${missingFields.join(", ")}`);
+    }
+  }
 
   const yoga = createYoga({
     schema: stitched,

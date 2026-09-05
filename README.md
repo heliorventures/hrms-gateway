@@ -1,6 +1,6 @@
 # kabipay-gateway
 
-TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At startup it resolves each KabiPay subgraph at `KABIPAY_SUBGRAPH_BASE_URL:<port>/graphql`, builds a merged schema, and exposes **one** HTTP endpoint for browsers and tools. Subgraphs that are down are **skipped** so partial local fleets still work (restart the gateway after bringing more services up for a full schema).
+TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At startup it resolves each KabiPay subgraph at `KABIPAY_SUBGRAPH_BASE_URL:<port>/graphql`, builds a merged schema, and exposes **one** HTTP endpoint for browsers and tools. Development permits a partial local fleet. Production fails startup when a configured subgraph or a required client schema field is unavailable, so it cannot expose an incomplete schema to users.
 
 **Not in the gateway:** `kabipay-auth` (REST, port 4001) and `kabipay-outbox-worker` (no HTTP) — the UI points `authUrl` at auth and `gatewayUrl` here.
 
@@ -49,6 +49,7 @@ copy .env.example .env
 |----------|---------|
 | `KABIPAY_SUBGRAPH_BASE_URL` | Base URL for subgraphs, **no trailing slash** (e.g. `http://127.0.0.1`). Each subgraph serves `/graphql` on its port. |
 | `KABIPAY_GATEWAY_PORT` | Port for this gateway (default **4009**). |
+| `KABIPAY_ALLOW_PARTIAL_SUBGRAPHS` | Optional `true`/`false` override. Defaults to `false` in production and `true` otherwise. |
 
 ## Install
 

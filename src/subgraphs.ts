@@ -32,6 +32,18 @@ export const SUBGRAPHS: SubgraphDef[] = [
   { name: "analytics", port: 4029, plane: "tenant" },
 ];
 
+export function allowPartialSubgraphs(
+  environment: Record<string, string | undefined> = process.env,
+): boolean {
+  const configured = environment.KABIPAY_ALLOW_PARTIAL_SUBGRAPHS?.trim().toLowerCase();
+  if (configured !== undefined && configured !== "") {
+    if (configured === "true") return true;
+    if (configured === "false") return false;
+    throw new Error("KABIPAY_ALLOW_PARTIAL_SUBGRAPHS must be true or false");
+  }
+  return environment.NODE_ENV?.trim().toLowerCase() !== "production";
+}
+
 export function baseUrl(): string {
   return (process.env.KABIPAY_SUBGRAPH_BASE_URL ?? "http://127.0.0.1").replace(
     /\/$/,
