@@ -30,6 +30,7 @@ export const SUBGRAPHS: SubgraphDef[] = [
   { name: "workflow", port: 4027, plane: "tenant" },
   { name: "notification", port: 4028, plane: "tenant" },
   { name: "analytics", port: 4029, plane: "tenant" },
+  { name: "survey", port: 4030, plane: "tenant" },
 ];
 
 export function allowPartialSubgraphs(

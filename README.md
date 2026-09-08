@@ -8,7 +8,7 @@ TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At s
 
 - **Source of truth** for which subgraphs are stitched: `src/subgraphs.ts` (`SUBGRAPHS` — names, ports, **ops** vs **tenant** plane).
 - **Ops plane** (data in `kabipay_ops`): single subgraph **`ops`** on port **4010** (`kabipay-ops` binary).
-- **Tenant plane** (per-tenant schema): **4013–4029** — employee through analytics.
+- **Tenant plane** (per-tenant schema): **4013–4030** — employee through surveys.
 
 ## Dependencies
 
@@ -38,6 +38,7 @@ TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At s
 | workflow | 4027 | tenant |
 | notification | 4028 | tenant |
 | analytics | 4029 | tenant |
+| survey | 4030 | tenant |
 
 ## Configure
 
