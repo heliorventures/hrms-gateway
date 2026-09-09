@@ -3,6 +3,7 @@ import type { GraphQLObjectType, GraphQLSchema } from "graphql";
 const REQUIRED_CLIENT_FIELDS = {
   Query: [
     "myAttendanceSummary",
+    "leaveApprovalQueue",
     "notificationAutomationSettings",
     "myCelebrationPreferences",
     "benefitTypes",

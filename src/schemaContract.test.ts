@@ -12,6 +12,7 @@ test("reports required client fields missing from a stitched schema", () => {
   assert.equal(missing.includes("Mutation.saveSalaryBand"), true);
   assert.equal(missing.includes("Query.compensationReviewCycles"), true);
   assert.equal(missing.includes("Query.myAttendanceSummary"), true);
+  assert.equal(missing.includes("Query.leaveApprovalQueue"), true);
   assert.equal(missing.includes("Query.notificationAutomationSettings"), true);
   assert.equal(missing.includes("Mutation.updateMyCelebrationPreferences"), true);
 });
@@ -38,6 +39,7 @@ test("accepts the complete workplace and attendance schema contract", () => {
       salaryBands: [String!]!
       compensationReviewCycles: [String!]!
       myAttendanceSummary: String!
+      leaveApprovalQueue: String!
       notificationAutomationSettings: String!
       myCelebrationPreferences: String!
     }
