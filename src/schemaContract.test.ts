@@ -34,6 +34,7 @@ test("accepts the complete workplace and attendance schema contract", () => {
       surveyAudienceOptions: String!
       surveyManagementEvents: [String!]!
       availableSurveys: [String!]!
+      surveySubmissions: String!
       surveyResults: String!
       surveyResultsCatalog: [String!]!
       skills: [String!]!
@@ -86,7 +87,7 @@ test("accepts the complete workplace and attendance schema contract", () => {
 test("requires survey detail and administration queries for a matched UI release", () => {
   const schema = buildSchema("type Query { surveys: [String!]! availableSurveys: [String!]! surveyResults: String! surveyResultsCatalog: [String!]! }");
   const missing = missingRequiredClientFields(schema);
-  for (const name of ["survey", "surveyAudience", "surveyAudienceOptions", "surveyManagementEvents"]) {
+  for (const name of ["survey", "surveyAudience", "surveyAudienceOptions", "surveyManagementEvents", "surveySubmissions"]) {
     assert.ok(missing.includes(`Query.${name}`), `Missing contract requirement for ${name}`);
   }
   assert.ok(missing.includes("Mutation.openSurvey"));

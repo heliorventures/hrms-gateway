@@ -20,6 +20,7 @@ const REQUIRED_CLIENT_FIELDS = {
     "surveyAudienceOptions",
     "surveyManagementEvents",
     "availableSurveys",
+    "surveySubmissions",
     "surveyResults",
     "surveyResultsCatalog",
     "skills",
