@@ -29,6 +29,10 @@ test("accepts the complete workplace and attendance schema contract", () => {
       myTeamPerformanceReviews: [String!]!
       performanceReviewDetail: String!
       surveys: [String!]!
+      survey: String!
+      surveyAudience: String!
+      surveyAudienceOptions: String!
+      surveyManagementEvents: [String!]!
       availableSurveys: [String!]!
       surveyResults: String!
       surveyResultsCatalog: [String!]!
@@ -62,6 +66,7 @@ test("accepts the complete workplace and attendance schema contract", () => {
       acknowledgePerformanceReview: String!
       saveSurvey: String!
       publishSurvey: String!
+      openSurvey: String!
       closeSurvey: String!
       submitSurvey: String!
       saveSkill: String!
@@ -76,4 +81,13 @@ test("accepts the complete workplace and attendance schema contract", () => {
   `);
 
   assert.deepEqual(missingRequiredClientFields(schema), []);
+});
+
+test("requires survey detail and administration queries for a matched UI release", () => {
+  const schema = buildSchema("type Query { surveys: [String!]! availableSurveys: [String!]! surveyResults: String! surveyResultsCatalog: [String!]! }");
+  const missing = missingRequiredClientFields(schema);
+  for (const name of ["survey", "surveyAudience", "surveyAudienceOptions", "surveyManagementEvents"]) {
+    assert.ok(missing.includes(`Query.${name}`), `Missing contract requirement for ${name}`);
+  }
+  assert.ok(missing.includes("Mutation.openSurvey"));
 });
