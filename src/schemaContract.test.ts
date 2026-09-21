@@ -59,6 +59,8 @@ test("accepts the complete workplace and attendance schema contract", () => {
       activatePerformanceProgram: String!
       launchPerformanceCycle: String!
       proposePerformanceGoal: String!
+      updatePerformanceGoal: String!
+      deletePerformanceGoal: String!
       approvePerformanceGoals: String!
       addPerformanceFeedback: String!
       advancePerformanceCycle: String!
@@ -82,6 +84,20 @@ test("accepts the complete workplace and attendance schema contract", () => {
   `);
 
   assert.deepEqual(missingRequiredClientFields(schema), []);
+});
+
+test("requires goal update and deletion mutations from the current performance schema", () => {
+  const schema = buildSchema(`
+    type Query { performancePrograms: [String!]! }
+    type Mutation {
+      proposePerformanceGoal: String!
+      approvePerformanceGoals: String!
+    }
+  `);
+
+  const missing = missingRequiredClientFields(schema);
+  assert.ok(missing.includes("Mutation.updatePerformanceGoal"));
+  assert.ok(missing.includes("Mutation.deletePerformanceGoal"));
 });
 
 test("requires survey detail and administration queries for a matched UI release", () => {

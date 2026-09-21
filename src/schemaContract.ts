@@ -41,6 +41,8 @@ const REQUIRED_CLIENT_FIELDS = {
     "activatePerformanceProgram",
     "launchPerformanceCycle",
     "proposePerformanceGoal",
+    "updatePerformanceGoal",
+    "deletePerformanceGoal",
     "approvePerformanceGoals",
     "addPerformanceFeedback",
     "advancePerformanceCycle",
