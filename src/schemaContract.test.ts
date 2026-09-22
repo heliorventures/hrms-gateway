@@ -28,6 +28,13 @@ test("accepts the complete workplace and attendance schema contract", () => {
       myPerformanceReviews: [String!]!
       myTeamPerformanceReviews: [String!]!
       performanceReviewDetail: String!
+      performanceProgramPolicy: String!
+      performanceAdminCycles: String!
+      performanceCycleAdministration: String!
+      performancePopulationOptions: String!
+      privatePerformanceFeedback: String!
+      performanceGoalKpis: [String!]!
+      performanceReviewRevision: String!
       surveys: [String!]!
       survey: String!
       surveyAudience: String!
@@ -67,6 +74,16 @@ test("accepts the complete workplace and attendance schema contract", () => {
       submitSelfAppraisal: String!
       submitManagerAppraisal: String!
       acknowledgePerformanceReview: String!
+      savePerformanceProgramPolicy: String!
+      archivePerformanceProgram: String!
+      savePerformanceCalibration: String!
+      reopenPerformanceReview: String!
+      setPerformanceParticipantExcluded: String!
+      addPrivatePerformanceFeedback: String!
+      savePerformanceKpiTarget: String!
+      submitPerformanceKpiActual: String!
+      deletePerformanceGoalKpi: Boolean!
+      retryPerformanceException: String!
       saveSurvey: String!
       publishSurvey: String!
       openSurvey: String!
