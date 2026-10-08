@@ -12,6 +12,7 @@ test("reports required client fields missing from a stitched schema", () => {
   assert.equal(missing.includes("Mutation.saveSalaryBand"), true);
   assert.equal(missing.includes("Query.compensationReviewCycles"), true);
   assert.equal(missing.includes("Query.myAttendanceSummary"), true);
+  assert.equal(missing.includes("Query.leaveApprovalQueue"), true);
   assert.equal(missing.includes("Query.notificationAutomationSettings"), true);
   assert.equal(missing.includes("Mutation.updateMyCelebrationPreferences"), true);
 });
@@ -27,8 +28,20 @@ test("accepts the complete workplace and attendance schema contract", () => {
       myPerformanceReviews: [String!]!
       myTeamPerformanceReviews: [String!]!
       performanceReviewDetail: String!
+      performanceProgramPolicy: String!
+      performanceAdminCycles: String!
+      performanceCycleAdministration: String!
+      performancePopulationOptions: String!
+      privatePerformanceFeedback: String!
+      performanceGoalKpis: [String!]!
+      performanceReviewRevision: String!
       surveys: [String!]!
+      survey: String!
+      surveyAudience: String!
+      surveyAudienceOptions: String!
+      surveyManagementEvents: [String!]!
       availableSurveys: [String!]!
+      surveySubmissions: String!
       surveyResults: String!
       surveyResultsCatalog: [String!]!
       skills: [String!]!
@@ -38,6 +51,7 @@ test("accepts the complete workplace and attendance schema contract", () => {
       salaryBands: [String!]!
       compensationReviewCycles: [String!]!
       myAttendanceSummary: String!
+      leaveApprovalQueue: String!
       notificationAutomationSettings: String!
       myCelebrationPreferences: String!
     }
@@ -52,14 +66,27 @@ test("accepts the complete workplace and attendance schema contract", () => {
       activatePerformanceProgram: String!
       launchPerformanceCycle: String!
       proposePerformanceGoal: String!
+      updatePerformanceGoal: String!
+      deletePerformanceGoal: String!
       approvePerformanceGoals: String!
       addPerformanceFeedback: String!
       advancePerformanceCycle: String!
       submitSelfAppraisal: String!
       submitManagerAppraisal: String!
       acknowledgePerformanceReview: String!
+      savePerformanceProgramPolicy: String!
+      archivePerformanceProgram: String!
+      savePerformanceCalibration: String!
+      reopenPerformanceReview: String!
+      setPerformanceParticipantExcluded: String!
+      addPrivatePerformanceFeedback: String!
+      savePerformanceKpiTarget: String!
+      submitPerformanceKpiActual: String!
+      deletePerformanceGoalKpi: Boolean!
+      retryPerformanceException: String!
       saveSurvey: String!
       publishSurvey: String!
+      openSurvey: String!
       closeSurvey: String!
       submitSurvey: String!
       saveSkill: String!
@@ -74,4 +101,27 @@ test("accepts the complete workplace and attendance schema contract", () => {
   `);
 
   assert.deepEqual(missingRequiredClientFields(schema), []);
+});
+
+test("requires goal update and deletion mutations from the current performance schema", () => {
+  const schema = buildSchema(`
+    type Query { performancePrograms: [String!]! }
+    type Mutation {
+      proposePerformanceGoal: String!
+      approvePerformanceGoals: String!
+    }
+  `);
+
+  const missing = missingRequiredClientFields(schema);
+  assert.ok(missing.includes("Mutation.updatePerformanceGoal"));
+  assert.ok(missing.includes("Mutation.deletePerformanceGoal"));
+});
+
+test("requires survey detail and administration queries for a matched UI release", () => {
+  const schema = buildSchema("type Query { surveys: [String!]! availableSurveys: [String!]! surveyResults: String! surveyResultsCatalog: [String!]! }");
+  const missing = missingRequiredClientFields(schema);
+  for (const name of ["survey", "surveyAudience", "surveyAudienceOptions", "surveyManagementEvents", "surveySubmissions"]) {
+    assert.ok(missing.includes(`Query.${name}`), `Missing contract requirement for ${name}`);
+  }
+  assert.ok(missing.includes("Mutation.openSurvey"));
 });
