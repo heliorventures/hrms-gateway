@@ -3,6 +3,13 @@ import test from "node:test";
 import { buildSchema } from "graphql";
 import { loanSchemaOwnershipErrors } from "./schemaContract.js";
 const loans = buildSchema("type Query { myLoans: String! loanAccounts: String! } type Mutation { recordLoanReceipt: String! }");
+test("proposed repayment previews remain owned by Payroll", () => {
+  const schema = buildSchema("type Query { previewLoanDeduction: String! previewLoanPeriodOverride: String! }");
+  assert.deepEqual(loanSchemaOwnershipErrors([{ name: "payroll", schema }]), []);
+  const errors = loanSchemaOwnershipErrors([{ name: "employee", schema }]);
+  assert.equal(errors.length, 2);
+  assert.ok(errors.every((error) => error.includes("must be owned by Payroll")));
+});
 test("Payroll is the sole public owner of Loans", () => {
   assert.deepEqual(loanSchemaOwnershipErrors([{ name: "payroll", schema: loans }]), []);
   assert.ok(loanSchemaOwnershipErrors([{ name: "employee", schema: loans }]).some((error) => error.includes("Query.myLoans")));

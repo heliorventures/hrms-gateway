@@ -20,7 +20,7 @@ test("reports required client fields missing from a stitched schema", () => {
 test("accepts the complete workplace and attendance schema contract", () => {
   const schema = buildSchema(`
     type Query {
-      loanPolicy: String! previewLoanApproval: String! loanSchedulePreview: String! loanStatement: String! loanFinancialReconciliation: String! previewHistoricalLoanPayment: String! loanApprovalWorkflows: String!
+      loanPolicy: String! previewLoanDeduction: String previewLoanPeriodOverride: String previewLoanApproval: String! loanSchedulePreview: String! loanStatement: String! loanFinancialReconciliation: String! previewHistoricalLoanPayment: String! loanApprovalWorkflows: String!
       previewLoanExitReview: String! fnfSettlement: String! fnfFinancialReview: String! previewFnfLoanExposure: String! financeFollowUpOwners: String!
       myLoans: String! loanAccounts: String! myLoanRequests: String! loanRequestQueue: String! loanAccount: String! loanPolicies: String! loanPolicyVersions: String! loanLedger: String! loanPayments: String! loanSchedules: String! previewLoanReversal: String!
       benefitTypes: [String!]!
