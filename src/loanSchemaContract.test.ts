@@ -14,3 +14,11 @@ test("private financial coordination cannot be stitched into public GraphQL", ()
   assert.equal(errors.length, 2);
   assert.ok(errors.every((error) => error.includes("private financial")));
 });
+
+test("FNF and exit review have a single Finance owner after transfer", () => {
+  const finance = buildSchema("type Query { fnfSettlement: String fnfFinancialReview: String previewLoanExitReview: String } type Mutation { upsertFnfSettlement: String finalizeFnfSettlement: String saveFnfFinancialReview: String saveLoanExitReview: String }");
+  assert.deepEqual(loanSchemaOwnershipErrors([{ name: "payroll", schema: finance }]), []);
+  const duplicate = loanSchemaOwnershipErrors([{ name: "payroll", schema: finance }, { name: "employee", schema: finance }]);
+  assert.ok(duplicate.some((error) => error.includes("Query.fnfSettlement has multiple owners")));
+  assert.ok(duplicate.some((error) => error.includes("Mutation.finalizeFnfSettlement must be owned by Payroll")));
+});

@@ -2,7 +2,7 @@ import type { GraphQLObjectType, GraphQLSchema } from "graphql";
 
 const REQUIRED_CLIENT_FIELDS = {
   Query: [
-    "myLoans", "loanAccounts", "myLoanRequests", "loanRequestQueue", "loanAccount", "loanPolicies", "loanPolicyVersions", "loanLedger", "loanPayments", "loanSchedules", "previewLoanReversal",
+    "myLoans", "loanAccounts", "myLoanRequests", "loanRequestQueue", "loanAccount", "loanPolicy", "previewLoanApproval", "loanSchedulePreview", "loanStatement","loanFinancialReconciliation","previewHistoricalLoanPayment", "loanApprovalWorkflows", "loanPolicies", "loanPolicyVersions", "loanLedger", "loanPayments", "loanSchedules", "previewLoanReversal", "previewLoanExitReview", "fnfSettlement", "fnfFinancialReview", "previewFnfLoanExposure", "financeFollowUpOwners",
     "myAttendanceSummary",
     "leaveApprovalQueue",
     "notificationAutomationSettings",
@@ -39,7 +39,7 @@ const REQUIRED_CLIENT_FIELDS = {
     "compensationReviewCycles",
   ],
   Mutation: [
-    "publishLoanPolicy", "retireLoanPolicy", "saveLoanRequest", "submitLoanRequest", "decideLoanRequest", "withdrawLoanRequest", "recordLoanDisbursement", "recordLoanReceipt", "setLoanDeduction", "setLoanPeriodOverride", "reverseLoanPosting",
+    "publishLoanPolicy", "retireLoanPolicy", "saveLoanRequest", "submitLoanRequest", "decideLoanRequest", "withdrawLoanRequest", "recordLoanDisbursement", "recordLoanReceipt","cancelLoanFunding","reconcileLoanFinancials","recordHistoricalLoanPayment", "setLoanDeduction", "setLoanPeriodOverride", "reverseLoanPosting", "saveLoanExitReview", "upsertFnfSettlement", "saveFnfFinancialReview", "finalizeFnfSettlement",
     "saveBenefitType",
     "saveBenefitPlan",
     "saveJobPosting",
@@ -101,8 +101,8 @@ export function missingRequiredClientFields(schema: GraphQLSchema): string[] {
   ];
 }
 export function loanSchemaOwnershipErrors(subgraphs: readonly { name: string; schema: GraphQLSchema }[]): string[] {
-  const loanQueries = new Set(["myLoans", "loanAccounts", "myLoanRequests", "loanRequestQueue", "loanAccount", "loanPolicies", "loanPolicyVersions", "loanLedger", "loanPayments", "loanSchedules", "previewLoanReversal"]);
-  const loanMutations = new Set(["publishLoanPolicy", "retireLoanPolicy", "saveLoanRequest", "submitLoanRequest", "decideLoanRequest", "withdrawLoanRequest", "recordLoanDisbursement", "recordLoanReceipt", "setLoanDeduction", "setLoanPeriodOverride", "reverseLoanPosting"]);
+  const loanQueries = new Set(["myLoans", "loanAccounts", "myLoanRequests", "loanRequestQueue", "loanAccount", "loanPolicy", "previewLoanApproval", "loanSchedulePreview", "loanStatement","loanFinancialReconciliation","previewHistoricalLoanPayment", "loanApprovalWorkflows", "loanPolicies", "loanPolicyVersions", "loanLedger", "loanPayments", "loanSchedules", "previewLoanReversal", "previewLoanExitReview", "fnfSettlement", "fnfFinancialReview", "previewFnfLoanExposure", "financeFollowUpOwners"]);
+  const loanMutations = new Set(["publishLoanPolicy", "retireLoanPolicy", "saveLoanRequest", "submitLoanRequest", "decideLoanRequest", "withdrawLoanRequest", "recordLoanDisbursement", "recordLoanReceipt","cancelLoanFunding","reconcileLoanFinancials","recordHistoricalLoanPayment", "setLoanDeduction", "setLoanPeriodOverride", "reverseLoanPosting", "saveLoanExitReview", "upsertFnfSettlement", "saveFnfFinancialReview", "finalizeFnfSettlement"]);
   const privateFields = new Set(["lockRecoveryInputs", "prepareRecoveryQuote", "validateRecoveryQuote", "postPayrollRecoveries", "postFnfRecoveries", "authorizeExitReview", "confirmExitAuthorization", "cancelExitAuthorization"]);
   const owners = new Map<string, string[]>();
   const errors: string[] = [];
