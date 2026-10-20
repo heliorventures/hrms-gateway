@@ -2,6 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { forwardHeaders } from "./forwardHeaders.js";
 
+test("forwards only the organization source selector and never asserted actors", () => {
+  const headers = forwardHeaders(new Request("http://gateway.test/graphql", { headers: {
+    "x-login-company-id": "company-selector", "x-principal-id": "forged", "x-organization-role": "administrator",
+  } }));
+  assert.deepEqual(headers, { "x-login-company-id": "company-selector" });
+});
+
 test("forwards the allowed tenant, identity, client IP, and request ID headers", () => {
   const request = new Request("http://gateway.test/graphql", {
     headers: {

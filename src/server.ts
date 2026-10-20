@@ -9,8 +9,8 @@
  *  - Introspects every reachable subgraph at startup.
  *  - Stitches their schemas into a single executable schema via
  *    `@graphql-tools/stitch`.
- *  - Forwards the `x-tenant-id` header through to each subgraph so
- *    tenant-plane resolvers can pick it up (until real JWT auth lands).
+ *  - Forwards authenticated session headers to fixed configured subgraphs.
+ *    Each source verifies its JWT and company binding; selectors are not authority.
  *  - Serves the combined schema at `http://127.0.0.1:4009/graphql`
  *    with a Yoga playground.
  */
@@ -23,7 +23,7 @@ import { forwardHeaders } from "./forwardHeaders.js";
 import { missingRequiredClientFields, loanSchemaOwnershipErrors } from "./schemaContract.js";
 import {
   allowPartialSubgraphs,
-  SUBGRAPHS,
+  configuredSubgraphs,
   subgraphUrl,
   type SubgraphDef,
 } from "./subgraphs.js";
@@ -46,7 +46,7 @@ function forwardedExecutorHeaders(executorRequest?: { context?: unknown }): Reco
 }
 
 async function loadSubgraph(def: SubgraphDef): Promise<StitchedSubgraph | null> {
-  const url = subgraphUrl(def.port);
+  const url = subgraphUrl(def);
   const executor = buildHTTPExecutor({
     endpoint: url,
     headers: forwardedExecutorHeaders,
@@ -64,13 +64,14 @@ async function loadSubgraph(def: SubgraphDef): Promise<StitchedSubgraph | null> 
 }
 
 async function main() {
+  const subgraphs = configuredSubgraphs();
   console.log("[gateway] booting KabiPay stitching gateway\u2026");
   const loaded = (
-    await Promise.all(SUBGRAPHS.map((def) => loadSubgraph(def)))
+    await Promise.all(subgraphs.map((def) => loadSubgraph(def)))
   ).filter((s): s is StitchedSubgraph => s !== null);
 
   const loadedNames = new Set(loaded.map(({ def }) => def.name));
-  const missing = SUBGRAPHS.filter(({ name }) => !loadedNames.has(name));
+  const missing = subgraphs.filter(({ name }) => !loadedNames.has(name));
   const partialSubgraphsAllowed = allowPartialSubgraphs();
   if (missing.length > 0 && !partialSubgraphsAllowed) {
     throw new Error(
@@ -96,7 +97,7 @@ async function main() {
     }),
   });
 
-  if (!partialSubgraphsAllowed) {
+  if (!partialSubgraphsAllowed && subgraphs.some(def => def.plane === "tenant")) {
     const missingFields = missingRequiredClientFields(stitched);
     if (missingFields.length > 0) {
       throw new Error(`required client schema fields unavailable: ${missingFields.join(", ")}`);
@@ -114,7 +115,7 @@ async function main() {
   const server = createServer(yoga);
   server.listen(GATEWAY_PORT, () => {
     console.log(
-      `[gateway] listening on http://127.0.0.1:${GATEWAY_PORT}/graphql with ${loaded.length}/${SUBGRAPHS.length} subgraphs`,
+      `[gateway] listening on http://127.0.0.1:${GATEWAY_PORT}/graphql with ${loaded.length}/${subgraphs.length} subgraphs`,
     );
   });
 }

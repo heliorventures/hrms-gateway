@@ -1,5 +1,6 @@
 const FORWARDED_HEADERS = [
   "authorization",
+  "x-login-company-id",
   "x-tenant-id",
   "x-forwarded-for",
   "x-real-ip",
