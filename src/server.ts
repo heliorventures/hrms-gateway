@@ -20,7 +20,7 @@ import { schemaFromExecutor } from "@graphql-tools/wrap";
 import { buildHTTPExecutor } from "@graphql-tools/executor-http";
 import { createServer } from "node:http";
 import { forwardHeaders } from "./forwardHeaders.js";
-import { missingRequiredClientFields } from "./schemaContract.js";
+import { missingRequiredClientFields, loanSchemaOwnershipErrors } from "./schemaContract.js";
 import {
   allowPartialSubgraphs,
   SUBGRAPHS,
@@ -84,6 +84,8 @@ async function main() {
     );
   }
 
+  const loanOwnershipErrors = loanSchemaOwnershipErrors(loaded.map(({ def, schema }) => ({ name: def.name, schema })));
+  if (loanOwnershipErrors.length > 0) throw new Error(`invalid loan schema ownership: ${loanOwnershipErrors.join(", ")}`);
   const stitched = stitchSchemas({
     subschemas: loaded.map((s) => {
       const executor = buildHTTPExecutor({
