@@ -14,7 +14,7 @@ TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At s
 
 | Requirement | Notes |
 |-------------|--------|
-| **Node.js** | LTS (v20+ recommended). |
+| **Node.js** | 22.18 or newer; release images use Node 22. |
 | **npm** | Comes with Node. |
 | **Rust subgraphs** | Running or reachable at `KABIPAY_SUBGRAPH_BASE_URL` + ports below. |
 
@@ -39,6 +39,18 @@ TypeScript **GraphQL gateway** using **GraphQL Yoga** and schema stitching. At s
 | notification | 4028 | tenant |
 | analytics | 4029 | tenant |
 | survey | 4030 | tenant |
+
+## Dependency security
+
+Run `npm ci`, `npm run security:audit`, `npm test` and `npm run build` before a release.
+The audit includes development dependencies and fails on any known advisory or an
+unavailable registry. The Dockerfile enforces the same check during dependency
+installation. The shared release script also runs fresh container audits before
+building any image, so Docker cache reuse cannot skip newly published advisories.
+
+The gateway tests include prototype-pollution regressions and local HTTP
+introspection/stitching with concurrent synthetic company credentials.
+Passing these checks does not establish live tenant or database acceptance.
 
 ## Configure
 
