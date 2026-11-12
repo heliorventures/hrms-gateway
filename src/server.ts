@@ -21,6 +21,7 @@ import { buildHTTPExecutor } from "@graphql-tools/executor-http";
 import { createServer } from "node:http";
 import { forwardHeaders } from "./forwardHeaders.js";
 import { missingRequiredClientFields, loanSchemaOwnershipErrors } from "./schemaContract.js";
+import { SCHEMA_DISCOVERY_OPTIONS } from "./schemaDiscovery.js";
 import {
   allowPartialSubgraphs,
   configuredSubgraphs,
@@ -52,7 +53,7 @@ async function loadSubgraph(def: SubgraphDef): Promise<StitchedSubgraph | null> 
     headers: forwardedExecutorHeaders,
   });
   try {
-    const schema = await schemaFromExecutor(executor);
+    const schema = await schemaFromExecutor(executor, undefined, SCHEMA_DISCOVERY_OPTIONS);
     console.log(`[gateway] \u2714 ${def.name.padEnd(14)} introspected from ${url}`);
     return { def, schema, url };
   } catch (err) {
